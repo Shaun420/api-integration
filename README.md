@@ -2,7 +2,6 @@
 
 A robust, asynchronous command-line tool built with Python to fetch, filter, and cache country data from the public REST Countries API.
 
----
 
 ## Features
 
@@ -11,7 +10,6 @@ A robust, asynchronous command-line tool built with Python to fetch, filter, and
 *   **Data Normalization:** Uses **Pydantic Model Validators** to flatten deeply nested API responses (e.g., transforming `name['nativeName']['hin']['common']` into a simple string) before the data enters the application logic.
 *   **Rich UI:** specific fields (Official Name, Capital, Currency, Timezone) are displayed in a clean, color-coded table using `rich`.
 
----
 
 ## Setup and Installation
 
@@ -43,7 +41,6 @@ A robust, asynchronous command-line tool built with Python to fetch, filter, and
     python main.py city "Tokyo"
     ```
 
----
 
 ## Error Handling
 
@@ -54,7 +51,6 @@ The application implements a multi-layer error handling strategy:
 3.  **Data Parsing:** The **Pydantic validator** is designed to handle missing keys (e.g., countries with no `capital`) by assigning default values (`"N/A"`) instead of crashing.
 4.  **Context Safety:** Database and Network connections are managed via **Async Context Managers** (`async with`), ensuring connections close correctly even during crashes.
 
----
 
 ## API Endpoints Used
 
@@ -65,7 +61,6 @@ The application queries the [REST Countries v3.1 API](https://restcountries.com/
 | `GET` | `/v3.1/name/{name}` | Search by country name (e.g., "India") |
 | `GET` | `/v3.1/capital/{city}` | Search by capital city (e.g., "Paris") |
 
----
 
 ## Testing
 
@@ -74,3 +69,7 @@ Run the test suite to verify logic, including mock API responses:
 ```bash
 pytest -v
 ```
+
+
+## LICENSE
+See [LICENSE](LICENSE)
