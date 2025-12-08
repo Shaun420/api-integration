@@ -17,8 +17,8 @@ A robust, asynchronous command-line tool built with Python to fetch, filter, and
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/country-fetcher.git
-    cd country-fetcher
+    git clone https://github.com/Shaun420/api-integration.git
+    cd api-integration
     ```
 
 2.  **Create a virtual environment:**
