@@ -1,9 +1,10 @@
 import aiosqlite
 from typing import List
 from .models import Country
+from .config import settings
 
 class CountryStorage:
-    def __init__(self, db_name: str = "countries.db"):
+    def __init__(self, db_name: str = settings.DB_NAME):
         self.db_name = db_name
         self.db = None
 

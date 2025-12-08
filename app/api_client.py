@@ -1,10 +1,13 @@
 import aiohttp
-import rich
+#import rich
+import logging
 from typing import List
 from .models import Country
+from .config import settings
 
+log = logging.getLogger("rich")
 class CountryAPI:
-    BASE_URL = "https://restcountries.com/v3.1"
+    BASE_URL = settings.API_BASE_URL
 
     def __init__(self, session: aiohttp.ClientSession):
         """
@@ -41,8 +44,8 @@ class CountryAPI:
                 return [Country(**item) for item in data]
 
         except aiohttp.ClientError as e:
-            rich.print(f"[API Error] Connection failed: {e}")
+            log.exception(f"[API Error] Connection failed: {e}")
             return []
         except Exception as e:
-            rich.print(f"[API Error] Unexpected error: {e}")
+            log.exception(f"[API Error] Unexpected error: {e}")
             return []
