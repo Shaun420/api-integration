@@ -2,6 +2,7 @@ import asyncio
 import argparse
 import aiohttp
 import logging
+from time import time
 from rich.console import Console
 from rich.table import Table
 from rich.logging import RichHandler
@@ -9,6 +10,7 @@ from rich.logging import RichHandler
 from app.models import Country
 from app.database import CountryStorage
 from app.api_client import CountryAPI
+from app.config import settings
 
 logging.basicConfig(handlers=[RichHandler()])
 
@@ -57,18 +59,39 @@ async def handle_request(args, session, storage):
 	
 	console.print(f"[bold blue]Searching for {args.command}: '{args.query}'...[/bold blue]")
 	
-	# 1. API Fetch
-	countries = await api.fetch(endpoint, args.query)
-	
-	if countries:
-		await storage.save_countries(countries)
-		console.print(f"[green]:ballot_box_with_check: Fetched and cached {len(countries)} result(s).[/green]")
-		display_table(countries)
-	else:
-		# 2. DB Fallback
-		console.print("[red]:x: API request failed or not found. Checking local database...[/red]")
-		cached = await storage.get_countries(args.query)
+	all_cached = await storage.get_countries(args.query)
+
+	current_time = int(time())
+	cache_ttl = settings.CACHE_TTL_DAYS * 86400
+
+	cached = [
+		country
+		for country in all_cached
+		if (current_time - country.last_updated) < cache_ttl
+	]
+
+	if cached:
+		console.print(f"[green]:ballot_box_with_check: Fetched {len(cached)} result(s) from cache.[/green]")
 		display_table(cached)
+	else:
+		console.print(f"[dim]:hourglass: Not found in cache. Fetching from API endpoint.[/dim]")
+		try:
+			countries = await api.fetch(endpoint, args.query)
+			if countries:
+				await storage.save_countries(countries)
+				display_table(countries)
+				console.print(f"[green]:ballot_box_with_check: Fetched and cached {len(countries)} result(s).[/green]")
+			else:
+				console.print("[red]:x: API returned no results.[/red]")
+		except aiohttp.ClientError:
+			console.print("[bold red]:warning: API Connection Failed.[/bold red]")
+
+			# Fallback to cached data if exists
+			if all_cached:
+				console.print(f"[bold orange3]:warning: FALLBACK: Displaying cached data (Stale).[/bold orange3]")
+				display_table(all_cached)
+			else:
+				console.print(f"[bold red]:x: System Failure: API down and no local cache available.[/bold red]")
 
 async def main():
 	parser = argparse.ArgumentParser(description="Advanced Country Fetcher")

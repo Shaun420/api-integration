@@ -29,7 +29,8 @@ class CountryStorage:
             population INTEGER,
             currencies TEXT,
             languages TEXT,
-            timezone TEXT
+            timezone TEXT,
+			last_updated INT
         );
         """
         await self.db.execute(query)
@@ -38,13 +39,13 @@ class CountryStorage:
     async def save_countries(self, countries: List[Country]):
         query = """
         INSERT OR REPLACE INTO countries 
-        (code, name, official_name, capital, region, population, currencies, languages, timezone)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        (code, name, official_name, capital, region, population, currencies, languages, timezone, last_updated)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         data = [
             (
                 c.code, c.name, c.official_name, c.capital, c.region, 
-                c.population, c.currencies, c.languages, c.timezone
+                c.population, c.currencies, c.languages, c.timezone, c.last_updated
             )
             for c in countries
         ]
